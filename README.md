@@ -1,0 +1,2 @@
+# pegasus
+Golang message-broker.
