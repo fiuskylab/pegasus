@@ -46,5 +46,5 @@ message PopRequest {
 message PopResponse {
   string topic_name = 1;
   string body = 2;
-  string error = 2;
+  string error = 3;
 }
