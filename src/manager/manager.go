@@ -3,6 +3,7 @@ package manager
 import (
 	"fmt"
 
+	"github.com/fiuskylab/pegasus/src/message"
 	"github.com/fiuskylab/pegasus/src/topic"
 )
 
@@ -33,6 +34,7 @@ func (m *Manager) GetTopicNames() []string {
 
 const (
 	errTopicAlreadyExists = "topic named '%s' already exists"
+	errTopicNotFound      = "topic named '%s' not found"
 )
 
 // NewTopic creates a new Topic and adds it to the Manager.
@@ -47,4 +49,27 @@ func (m *Manager) NewTopic(name string) error {
 
 	m.topics[createdTopic.Name] = createdTopic
 	return nil
+}
+
+// Send inserts a message into Topic's internal queue.
+func (m *Manager) Send(msg *message.Message) error {
+	if err := msg.Validate(); err != nil {
+		return err
+	}
+	topic, ok := m.topics[msg.TopicName]
+	if !ok {
+		return fmt.Errorf(errTopicNotFound, msg.TopicName)
+	}
+
+	return topic.Send(msg)
+}
+
+// Pop retrieves a message from Topic's internal queue.
+func (m *Manager) Pop(name string) (*message.Message, error) {
+	topic, ok := m.topics[name]
+	if !ok {
+		return nil, fmt.Errorf(errTopicNotFound, name)
+	}
+
+	return topic.Pop()
 }
