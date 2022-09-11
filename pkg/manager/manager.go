@@ -15,3 +15,14 @@ func NewManager() *Manager {
 		topics: map[string]topic.Topic{},
 	}
 }
+
+// GetTopicNames returns a list of names of all created Topics.
+func (m *Manager) GetTopicNames() []string {
+	topics := []string{}
+
+	for k := range m.topics {
+		topics = append(topics, k)
+	}
+
+	return topics
+}
