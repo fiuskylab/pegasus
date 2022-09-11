@@ -1,7 +1,7 @@
 package topic
 
 import (
-	"github.com/fiuskylab/pegasus/pkg/message"
+	"github.com/fiuskylab/pegasus/src/message"
 	"github.com/google/uuid"
 )
 
