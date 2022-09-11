@@ -27,6 +27,29 @@ func NewGRPCRepo(mgr *manager.Manager) *GRPCRepo {
 	}
 }
 
+// CreateTopic -
+func (g *GRPCRepo) CreateTopic(ctx context.Context, req *proto.CreateTopicRequest) (*proto.CreateTopicResponse, error) {
+	ctx, cancel := context.WithTimeout(ctx, time.Second*2)
+	defer cancel()
+	errChan := make(chan error, 1)
+
+	go func() {
+		errChan <- g.mgr.NewTopic(req.Name)
+	}()
+
+	select {
+	case <-ctx.Done():
+		return nil, status.Error(codes.DeadlineExceeded, "timeout")
+	case err := <-errChan:
+		if err != nil {
+			return nil, status.Error(codes.Canceled, err.Error())
+		}
+		return &proto.CreateTopicResponse{
+			Error: "",
+		}, nil
+	}
+}
+
 // Send - Endpoint fo
 func (g *GRPCRepo) Send(ctx context.Context, req *proto.SendRequest) (*proto.SendResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, time.Second*2)
