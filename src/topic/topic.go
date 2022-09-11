@@ -8,9 +8,9 @@ import (
 type (
 	// Topic is a "named queue" that services can subscribe to.
 	Topic struct {
-		input  chan *message.Message
-		output chan *message.Message
-		Name   string
+		// q is the Topic's internal queue.
+		q    chan *message.Message
+		Name string
 	}
 )
 
@@ -26,19 +26,19 @@ func NewTopic(name string) (*Topic, error) {
 	}
 
 	return &Topic{
-		input:  make(chan *message.Message),
-		output: make(chan *message.Message),
-		Name:   name,
+		q:    make(chan *message.Message, 10),
+		Name: name,
 	}, nil
 }
 
 // Send will put a message in Topic input channel.
 func (t *Topic) Send(m *message.Message) error {
-	t.input <- m
+	t.q <- m
 	return nil
 }
 
 // Pop will retrieve and delete a message from the output channel.
 func (t *Topic) Pop() (*message.Message, error) {
-	return <-t.output, nil
+	msg := <-t.q
+	return msg, nil
 }
