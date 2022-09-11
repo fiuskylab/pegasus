@@ -7,6 +7,7 @@ import (
 	"github.com/fiuskylab/pegasus/src/manager"
 	"github.com/fiuskylab/pegasus/src/proto"
 	"github.com/fiuskylab/pegasus/src/repository"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 )
 
@@ -28,7 +29,7 @@ func NewGRPC(mgr *manager.Manager) *GRPC {
 
 	srv := grpc.NewServer(opts...)
 
-	repo := repository.NewGRPCRepo()
+	repo := repository.NewGRPCRepo(mgr)
 
 	return &GRPC{
 		mgr:  mgr,
@@ -41,11 +42,16 @@ func NewGRPC(mgr *manager.Manager) *GRPC {
 // Start - starts the gRPC server.
 func (g *GRPC) Start(port uint) error {
 	var err error
-	g.listener, err = net.Listen("tcp", fmt.Sprintf("localhost:%d", port))
+	g.listener, err = net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", port))
 	if err != nil {
+		zap.L().Error(err.Error())
 		return err
 	}
 	proto.RegisterPegasusServer(g.srv, proto.PegasusServer(g.repo))
+	if err := g.srv.Serve(g.listener); err != nil {
+		zap.L().Error(err.Error())
+		return err
+	}
 	return nil
 }
 
@@ -53,6 +59,7 @@ func (g *GRPC) Start(port uint) error {
 func (g *GRPC) Close() error {
 	g.srv.GracefulStop()
 	if err := g.listener.Close(); err != nil {
+		zap.L().Error(err.Error())
 		return err
 	}
 	return nil
