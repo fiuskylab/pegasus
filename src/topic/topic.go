@@ -16,16 +16,20 @@ type (
 
 // NewTopic creates a new Topic, if given name is empty, it generates
 // an UUID as a name.
-func NewTopic(name string) *Topic {
+func NewTopic(name string) (*Topic, error) {
 	if name == "" {
-		name = uuid.NewString()
+		id, err := uuid.NewRandom()
+		if err != nil {
+			return nil, err
+		}
+		name = id.String()
 	}
 
 	return &Topic{
 		input:  make(chan *message.Message),
 		output: make(chan *message.Message),
 		Name:   name,
-	}
+	}, nil
 }
 
 // Send will put a message in Topic input channel.
