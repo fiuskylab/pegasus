@@ -5,6 +5,7 @@ import (
 
 	"github.com/fiuskylab/pegasus/src/message"
 	"github.com/fiuskylab/pegasus/src/topic"
+	"go.uber.org/zap"
 )
 
 type (
@@ -16,6 +17,7 @@ type (
 
 // NewManager returns a new Manager
 func NewManager() *Manager {
+	zap.L().Debug("creating a manager")
 	return &Manager{
 		topics: map[string]*topic.Topic{},
 	}
@@ -39,11 +41,13 @@ const (
 
 // NewTopic creates a new Topic and adds it to the Manager.
 func (m *Manager) NewTopic(name string) error {
+	zap.L().Sugar().Infof("creating '%s' topic", name)
 	if _, ok := m.topics[name]; ok {
 		return fmt.Errorf(errTopicAlreadyExists, name)
 	}
 	createdTopic, err := topic.NewTopic(name)
 	if err != nil {
+		zap.L().Error(err.Error())
 		return err
 	}
 
@@ -53,7 +57,9 @@ func (m *Manager) NewTopic(name string) error {
 
 // Send inserts a message into Topic's internal queue.
 func (m *Manager) Send(msg *message.Message) error {
+	zap.L().Info("sending message", zap.Any("message", *msg))
 	if err := msg.Validate(); err != nil {
+		zap.L().Error(err.Error())
 		return err
 	}
 	topic, ok := m.topics[msg.TopicName]
@@ -66,6 +72,7 @@ func (m *Manager) Send(msg *message.Message) error {
 
 // Pop retrieves a message from Topic's internal queue.
 func (m *Manager) Pop(name string) (*message.Message, error) {
+	zap.L().Sugar().Infof("pop from '%s'", name)
 	topic, ok := m.topics[name]
 	if !ok {
 		return nil, fmt.Errorf(errTopicNotFound, name)

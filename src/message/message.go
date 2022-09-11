@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/fiuskylab/pegasus/src/proto"
+	"go.uber.org/zap"
 )
 
 type (
@@ -36,6 +37,7 @@ func FromRequest(req *proto.SendRequest) (*Message, error) {
 	}
 
 	if err := msg.Validate(); err != nil {
+		zap.L().Error(err.Error())
 		return nil, err
 	}
 

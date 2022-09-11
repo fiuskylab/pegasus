@@ -3,6 +3,7 @@ package topic
 import (
 	"github.com/fiuskylab/pegasus/src/message"
 	"github.com/google/uuid"
+	"go.uber.org/zap"
 )
 
 type (
@@ -20,6 +21,7 @@ func NewTopic(name string) (*Topic, error) {
 	if name == "" {
 		id, err := uuid.NewRandom()
 		if err != nil {
+			zap.L().Error(err.Error())
 			return nil, err
 		}
 		name = id.String()
