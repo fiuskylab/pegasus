@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 
+	"github.com/fiuskylab/pegasus/src/manager"
 	"github.com/fiuskylab/pegasus/src/proto"
 	"github.com/fiuskylab/pegasus/src/repository"
 	"google.golang.org/grpc"
@@ -14,15 +15,15 @@ type (
 	// gRPC server.
 	GRPC struct {
 		listener net.Listener
+		mgr      *manager.Manager
 		repo     *repository.GRPCRepo
 		srv      *grpc.Server
 		opts     []grpc.ServerOption
-		port     uint
 	}
 )
 
 // NewGRPC returns a new GRPC connector.
-func NewGRPC(port uint) *GRPC {
+func NewGRPC(mgr *manager.Manager) *GRPC {
 	var opts []grpc.ServerOption
 
 	srv := grpc.NewServer(opts...)
@@ -30,17 +31,17 @@ func NewGRPC(port uint) *GRPC {
 	repo := repository.NewGRPCRepo()
 
 	return &GRPC{
-		port: port,
+		mgr:  mgr,
 		opts: opts,
-		srv:  srv,
 		repo: repo,
+		srv:  srv,
 	}
 }
 
 // Start - starts the gRPC server.
-func (g *GRPC) Start() error {
+func (g *GRPC) Start(port uint) error {
 	var err error
-	g.listener, err = net.Listen("tcp", fmt.Sprintf("localhost:%d", g.port))
+	g.listener, err = net.Listen("tcp", fmt.Sprintf("localhost:%d", port))
 	if err != nil {
 		return err
 	}
