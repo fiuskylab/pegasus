@@ -31,14 +31,24 @@ func NewTopic(name string) (*Topic, error) {
 	}, nil
 }
 
-// Send will put a message in Topic input channel.
-func (t *Topic) Send(m *message.Message) error {
-	t.q <- m
-	return nil
+// GetReceiver will return a read-only Queue.
+func (t *Topic) GetReceiver() <-chan *message.Message {
+	return t.q
+}
+
+// GetSender will return a write-only Queue.
+func (t *Topic) GetSender() chan<- *message.Message {
+	return t.q
 }
 
 // Pop will retrieve and delete a message from the output channel.
 func (t *Topic) Pop() (*message.Message, error) {
 	msg := <-t.q
 	return msg, nil
+}
+
+// Send will put a message in Topic input channel.
+func (t *Topic) Send(m *message.Message) error {
+	t.q <- m
+	return nil
 }
