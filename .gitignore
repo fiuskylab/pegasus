@@ -16,3 +16,6 @@
 
 # Proto
 **/*.pb.go
+
+# tmp
+tmp/**/*
