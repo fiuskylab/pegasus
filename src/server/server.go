@@ -1,4 +1,4 @@
-package connector
+package server
 
 type (
 	// API wraps up server methods.
