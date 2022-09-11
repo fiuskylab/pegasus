@@ -1,6 +1,10 @@
 package message
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/fiuskylab/pegasus/src/proto"
+)
 
 type (
 	// Message - A data model that represents the messages
@@ -18,7 +22,25 @@ type (
 
 const (
 	errEmptyField = "field '%s' is empty"
+	errNilRequest = "received request is nil"
 )
+
+// FromRequest builds a Message from SendRequest and validates it.
+func FromRequest(req *proto.SendRequest) (*Message, error) {
+	if req == nil {
+		return nil, fmt.Errorf(errNilRequest)
+	}
+	msg := &Message{
+		Body:      req.Body,
+		TopicName: req.TopicName,
+	}
+
+	if err := msg.Validate(); err != nil {
+		return nil, err
+	}
+
+	return msg, nil
+}
 
 // Validate - validates Message fields
 func (m *Message) Validate() error {
