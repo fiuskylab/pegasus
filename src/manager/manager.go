@@ -40,7 +40,10 @@ func (m *Manager) NewTopic(name string) error {
 	if _, ok := m.topics[name]; ok {
 		return fmt.Errorf(errTopicAlreadyExists, name)
 	}
-	createdTopic := topic.NewTopic(name)
+	createdTopic, err := topic.NewTopic(name)
+	if err != nil {
+		return err
+	}
 
 	m.topics[createdTopic.Name] = createdTopic
 	return nil
