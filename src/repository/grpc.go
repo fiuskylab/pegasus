@@ -71,7 +71,7 @@ func (g *GRPCRepo) GetTopics(ctx context.Context, _ *proto.GetTopicsRequest) (*p
 	}
 }
 
-// Send - Endpoint fo
+// Send - Endpoint for inserting messages into a Topic.
 func (g *GRPCRepo) Send(ctx context.Context, req *proto.SendRequest) (*proto.SendResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, time.Second*2)
 	defer cancel()
@@ -103,7 +103,7 @@ func (g *GRPCRepo) Send(ctx context.Context, req *proto.SendRequest) (*proto.Sen
 	}
 }
 
-// Pop -
+// Pop - Retrieves and delete the first item in the Topic's queue.
 func (g *GRPCRepo) Pop(ctx context.Context, req *proto.PopRequest) (*proto.PopResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, time.Second*2)
 	defer cancel()
