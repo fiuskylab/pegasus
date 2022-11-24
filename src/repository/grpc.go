@@ -50,6 +50,27 @@ func (g *GRPCRepo) CreateTopic(ctx context.Context, req *proto.CreateTopicReques
 	}
 }
 
+// GetTopics returns a list of all topics.
+func (g *GRPCRepo) GetTopics(ctx context.Context, _ *proto.GetTopicsRequest) (*proto.GetTopicsResponse, error) {
+	ctx, cancel := context.WithTimeout(ctx, time.Second*2)
+	defer cancel()
+
+	topics := make(chan []string, 1)
+
+	go func() {
+		topics <- g.mgr.GetTopicNames()
+	}()
+
+	select {
+	case <-ctx.Done():
+		return nil, status.Error(codes.DeadlineExceeded, "timeout")
+	case tpcs := <-topics:
+		return &proto.GetTopicsResponse{
+			Topics: tpcs,
+		}, nil
+	}
+}
+
 // Send - Endpoint fo
 func (g *GRPCRepo) Send(ctx context.Context, req *proto.SendRequest) (*proto.SendResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, time.Second*2)

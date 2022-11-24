@@ -5,12 +5,18 @@ option go_package = "/proto";
 
 service Pegasus {
   rpc CreateTopic(CreateTopicRequest) returns (CreateTopicResponse);
+  rpc GetTopics(GetTopicsRequest) returns (GetTopicsResponse);
 
   rpc Send(SendRequest) returns (SendResponse);
   rpc Pop(PopRequest) returns (PopResponse);
 
   rpc Consumer(ConsumerRequest) returns (stream ConsumerResponse);
   rpc Producer(stream ProducerRequest) returns (stream ProducerResponse);
+}
+
+message GetTopicsRequest {}
+message GetTopicsResponse {
+  repeated string topics = 1;
 }
 
 message CreateTopicRequest {
