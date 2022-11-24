@@ -94,9 +94,9 @@ func (g *GRPCRepo) Pop(ctx context.Context, req *proto.PopRequest) (*proto.PopRe
 		msg, err := g.mgr.Pop(req.TopicName)
 		if err != nil {
 			errChan <- err
-		} else {
-			msgChan <- msg
+			return
 		}
+		msgChan <- msg
 	}()
 
 	select {
